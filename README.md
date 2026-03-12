@@ -8,7 +8,7 @@ P2GNAS-DTI is an innovative computational framework for drug-target interaction 
 * **Optimizing Complexity:** Employing Pareto multi-objective optimization to balance high predictive performance with efficient model complexity.
 
 * **The framework of P2GNAS-DTI is as follows:**
-![](pic\P2GNAS-DTI.svg)
+![P2GNAS-DTI framework](pic/P2GNAS-DTI.svg)
 
 ## Install based on Ubuntu 24.04
 Ensure you have installed CUDA 11.8 before installing other packages
