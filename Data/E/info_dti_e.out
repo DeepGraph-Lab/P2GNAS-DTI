@@ -1,0 +1,7 @@
+New shape after retrieving features for e: (2759, 2)
+Unique drugs for e: 422
+Unique proteins for e: 608
+Drug features dimension: 768
+Protein features dimension: 1280
+Total edges: 2759
+Cache directory: Data/E/cache

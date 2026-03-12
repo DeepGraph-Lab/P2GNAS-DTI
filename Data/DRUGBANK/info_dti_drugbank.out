@@ -1,0 +1,7 @@
+New shape after retrieving features for drugbank: (23698, 2)
+Unique drugs for drugbank: 6822
+Unique proteins for drugbank: 4646
+Drug features dimension: 768
+Protein features dimension: 1280
+Total edges: 23698
+Cache directory: Data/DRUGBANK/cache

@@ -1,0 +1,7 @@
+New shape after retrieving features for davis: (620, 2)
+Unique drugs for davis: 59
+Unique proteins for davis: 199
+Drug features dimension: 768
+Protein features dimension: 1280
+Total edges: 620
+Cache directory: Data/DAVIS/cache

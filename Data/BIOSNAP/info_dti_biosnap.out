@@ -1,0 +1,7 @@
+New shape after retrieving features for biosnap: (13838, 2)
+Unique drugs for biosnap: 4499
+Unique proteins for biosnap: 2113
+Drug features dimension: 768
+Protein features dimension: 1280
+Total edges: 13838
+Cache directory: Data/BIOSNAP/cache
