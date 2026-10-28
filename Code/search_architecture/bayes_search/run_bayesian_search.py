@@ -6,7 +6,7 @@ import json
 import torch_geometric.transforms as T
 from bayes_opt import BayesianOptimization
 
-# 复用您项目中的模型和评估器
+
 from Code.search_architecture.lstm_search.auto_model import FlexibleGNNModel
 from Code.search_architecture.lstm_search.Evaluator import LinkPredictionEvaluator
 from Code.search_architecture.random_search.run_search import load_and_split_data
@@ -45,7 +45,7 @@ def black_box_function(train_data,val_data,test_data,device,child_train_epochs,*
     try:
         layer_configs = []
 
-        num_layers = 3
+        num_layers = 6
 
         for i in range(1, num_layers + 1):
             conv_idx = round(params[f'l{i}_conv'])
@@ -89,7 +89,7 @@ def black_box_function(train_data,val_data,test_data,device,child_train_epochs,*
 
 
 def main():
-    child_train_epochs = 15
+    child_train_epochs = 50
 
     db_name = 'e'
     data, train_data, val_data, test_data = load_and_split_data(db_name)
@@ -103,6 +103,9 @@ def main():
         'l1_conv': (0, len(CONV_MAP) - 0.01), 'l1_norm': (0, len(NORM_MAP) - 0.01), 'l1_act': (0, len(ACT_MAP) - 0.01),
         'l2_conv': (0, len(CONV_MAP) - 0.01), 'l2_norm': (0, len(NORM_MAP) - 0.01), 'l2_act': (0, len(ACT_MAP) - 0.01),
         'l3_conv': (0, len(CONV_MAP) - 0.01), 'l3_norm': (0, len(NORM_MAP) - 0.01), 'l3_act': (0, len(ACT_MAP) - 0.01),
+        'l4_conv': (0, len(CONV_MAP) - 0.01), 'l4_norm': (0, len(NORM_MAP) - 0.01), 'l4_act': (0, len(ACT_MAP) - 0.01),
+        'l5_conv': (0, len(CONV_MAP) - 0.01), 'l5_norm': (0, len(NORM_MAP) - 0.01), 'l5_act': (0, len(ACT_MAP) - 0.01),
+        'l6_conv': (0, len(CONV_MAP) - 0.01), 'l6_norm': (0, len(NORM_MAP) - 0.01), 'l6_act': (0, len(ACT_MAP) - 0.01),
     }
 
     optimizer = BayesianOptimization(
@@ -116,20 +119,20 @@ def main():
     ), pbounds=pbounds, random_state=1, verbose=2)
 
     start = time.time()
-    optimizer.maximize(init_points=5, n_iter=20)
+    optimizer.maximize(init_points=50, n_iter=50)
     print(f'used time{time.time()-start}s')
     print("\nBayesian Optimization Finished!")
     print("Best architecture found during the run:")
     print(f"Reward: {optimizer.max['target']:.4f}")
 
-    TOP_K = 5
+    TOP_K = 60
 
 
     all_results_formatted = []
     for i, res in enumerate(optimizer.res):
         params = res['params']
         layer_configs = []
-        num_layers = 3
+        num_layers = 6
 
         for layer_idx in range(1, num_layers + 1):
             conv_idx = round(params[f'l{layer_idx}_conv'])
