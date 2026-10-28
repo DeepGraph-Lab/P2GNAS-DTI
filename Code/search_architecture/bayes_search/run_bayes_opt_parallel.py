@@ -48,7 +48,7 @@ def black_box_function(train_data, val_data, test_data, device, child_train_epoc
 
     try:
         layer_configs = []
-        num_layers = 3
+        num_layers = 6
 
         for i in range(1, num_layers + 1):
             conv_idx = round(params[f'l{i}_conv'])
@@ -118,9 +118,9 @@ def evaluate_batch_parallel(params_batch, train_data, val_data, test_data, devic
 
 
 def main():
-    child_train_epochs = 10
+    child_train_epochs = 50
 
-    batch_size = 4
+    batch_size = 2
     num_workers = os.cpu_count()
     print(f"Using {num_workers} worker threads")
 
@@ -143,6 +143,9 @@ def main():
         'l1_conv': (0, len(CONV_MAP) - 0.01), 'l1_norm': (0, len(NORM_MAP) - 0.01), 'l1_act': (0, len(ACT_MAP) - 0.01),
         'l2_conv': (0, len(CONV_MAP) - 0.01), 'l2_norm': (0, len(NORM_MAP) - 0.01), 'l2_act': (0, len(ACT_MAP) - 0.01),
         'l3_conv': (0, len(CONV_MAP) - 0.01), 'l3_norm': (0, len(NORM_MAP) - 0.01), 'l3_act': (0, len(ACT_MAP) - 0.01),
+        'l4_conv': (0, len(CONV_MAP) - 0.01), 'l4_norm': (0, len(NORM_MAP) - 0.01), 'l4_act': (0, len(ACT_MAP) - 0.01),
+        'l5_conv': (0, len(CONV_MAP) - 0.01), 'l5_norm': (0, len(NORM_MAP) - 0.01), 'l5_act': (0, len(ACT_MAP) - 0.01),
+        'l6_conv': (0, len(CONV_MAP) - 0.01), 'l6_norm': (0, len(NORM_MAP) - 0.01), 'l6_act': (0, len(ACT_MAP) - 0.01),
     }
 
     optimizer = BayesianOptimization(
@@ -162,7 +165,7 @@ def main():
     print("Phase 1: Random Initialization (Parallel)")
     print("=" * 60)
 
-    init_points = 20
+    init_points = 50
     init_batches = init_points // batch_size
 
     for batch_idx in range(init_batches):
@@ -195,7 +198,7 @@ def main():
     print("Phase 2: Bayesian Optimization (Parallel)")
     print("=" * 60)
 
-    n_iter = 16
+    n_iter = 50
     n_batches = n_iter // batch_size
 
     for batch_idx in range(n_batches):
@@ -234,7 +237,7 @@ def main():
     print(f"  Reward: {optimizer.max['target']:.4f}")
     print(f"  Parameters: {optimizer.max['params']}")
 
-    TOP_K = 5
+    TOP_K = 60
     top_k_results = save_top_k_bayes(db_name, all_results, TOP_K)
 
     print("\n=== Top-5 Architectures ===")
