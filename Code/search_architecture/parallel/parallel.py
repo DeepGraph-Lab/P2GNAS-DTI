@@ -78,7 +78,7 @@ def bayes_search(db_name, data, train_data, val_data, test_data, device):
     child_train_epochs = 50
     TOP_K = 60
 
-    batch_size = 2
+    batch_size = 4
     num_workers = min(batch_size, os.cpu_count() if os.cpu_count() else 1)
 
 
