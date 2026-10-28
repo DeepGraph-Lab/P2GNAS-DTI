@@ -46,7 +46,7 @@ def save_top_k_bayes(db_name, all_results, top_k):
     return top_k_results
 
 
-def params_to_onehot(params, num_layers=3):
+def params_to_onehot(params, num_layers=6):
 
     def one_hot(idx, size):
         v = np.zeros(size, dtype=np.float32)
@@ -63,7 +63,7 @@ def params_to_onehot(params, num_layers=3):
     return np.concatenate(feats)
 
 
-def params_to_layer_configs(params, num_layers=3):
+def params_to_layer_configs(params, num_layers=6):
     layer_configs = []
     for i in range(1, num_layers + 1):
         conv_idx = int(round(params[f'l{i}_conv']))
@@ -82,7 +82,7 @@ def params_to_layer_configs(params, num_layers=3):
 
 def random_sample_params():
     p = {}
-    for l in (1, 2, 3):
+    for l in range(1, 7):
         p[f'l{l}_conv'] = int(np.random.randint(0, len(CONV_CHOICES)))
         p[f'l{l}_norm'] = int(np.random.randint(0, len(NORM_CHOICES)))
         p[f'l{l}_act'] = int(np.random.randint(0, len(ACT_CHOICES)))
@@ -92,7 +92,7 @@ def random_sample_params():
 def black_box_function(train_data, val_data, test_data, device, child_train_epochs, params):
 
     try:
-        layer_configs = params_to_layer_configs(params, num_layers=3)
+        layer_configs = params_to_layer_configs(params, num_layers=6)
         print(f"\n[Eval] Testing architecture: {layer_configs}")
 
         child_model = FlexibleGNNModel(layer_configs, train_data.metadata()).to(device)
@@ -127,7 +127,7 @@ def black_box_function(train_data, val_data, test_data, device, child_train_epoc
 
 def main():
 
-    child_train_epochs = 15
+    child_train_epochs = 50
     db_name = 'e'
     seed = 1
     np.random.seed(seed)
@@ -146,10 +146,10 @@ def main():
     val_data = val_data.to(device)
     test_data = test_data.to(device)
 
-    init_points = 5
-    n_iter = 20
+    init_points = 50
+    n_iter = 50
     candidate_pool_size = 3000
-    top_k_save = 5
+    top_k_save = 60
 
     X_list = []
     Y_list = []
@@ -191,7 +191,7 @@ def main():
         try:
             fit_gpytorch_model(mll)
         except Exception as e:
-            print(f"[GP fit error] {e}. 尝试继续（用当前 GP）")
+            print(f"[GP fit error] {e}. try（now GP）")
 
         best_f = Y_train.max().item()
         acq = ExpectedImprovement(model=gp, best_f=best_f)
@@ -223,7 +223,7 @@ def main():
             best_idx = int(torch.argmax(acq_vals_cpu).item())
 
         best_candidate = candidates[best_idx]
-        print(f"[BO] 选中 candidate index {best_idx} from pool. Params: {best_candidate}")
+        print(f"[BO] choise candidate index {best_idx} from pool. Params: {best_candidate}")
 
         y_new = black_box_function(train_data, val_data, test_data, device, child_train_epochs, best_candidate)
 
