@@ -12,13 +12,6 @@ from sklearn.metrics import roc_auc_score, average_precision_score
 from P2GNAS import Model, EarlyStopper, shuffle_label_data
 from utils import plot_auc
 
-try:
-    from Code.search_architecture.lstm_search.auto_model import FlexibleGNNModel
-except ImportError:
-    from search_architecture.lstm_search.auto_model import FlexibleGNNModel
-
-
-
 
 ######################################## START MAIN #########################################
 #############################################################################################
@@ -31,8 +24,6 @@ def main():
                              "DEBUG=4")
     parser.add_argument("-d", "--database", help="database: e, nr, ic, gpcr, drugbank", type=str)
     parser.add_argument("-e", "--hidden", default=60, help="specify dimension of embedding", type=int)
-    parser.add_argument("--arch", default=None,
-                        help="path to the search log JSON containing the selected architecture")
 
     args = parser.parse_args()
     log_levels = {
@@ -119,7 +110,6 @@ def main():
 
     # Load data
     data = torch.load(PATH_DATA, weights_only=False).to(device)
-    # data2 = torch.load(PATH_DATA2, weights_only=False).to(device)
     logging.debug(f'Data is cuda?: {data.is_cuda}')
     print(f'Data is cuda?: {data.is_cuda}')
 
@@ -151,31 +141,7 @@ def main():
     ## Run model
     logging.info(f'hidden channels: {hidden_channels}')
 
-    if hidden_channels != 60:
-        print('Warning: FlexibleGNNModel uses a fixed hidden dimension of 60; the -e value is ignored.')
-
-    arch_path = args.arch
-    if arch_path is None:
-        arch_path = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
-            'search_architecture', 'results_6', DATABASE, f'{DATABASE}_log.json'
-        )
-    if not os.path.exists(arch_path):
-        raise FileNotFoundError(
-            f"Search result not found: {arch_path}. "
-            "Run the parallel search first or pass --arch /path/to/<dataset>_log.json."
-        )
-    with open(arch_path, 'r', encoding='utf-8') as f:
-        search_record = json.load(f)
-    architecture = search_record['architecture'] if isinstance(search_record, dict) else search_record
-    if isinstance(architecture, str):
-        import ast
-        architecture = ast.literal_eval(architecture)
-    if not isinstance(architecture, list) or not architecture:
-        raise ValueError(f"Invalid architecture in {arch_path}: {architecture!r}")
-
-    model = FlexibleGNNModel(architecture, data.metadata()).to(device)
-    print('Using searched architecture:', architecture)
+    model = Model(hidden_channels=hidden_channels, data=data).to(device)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 
@@ -252,7 +218,6 @@ def main():
     # if not exists create it
     if not os.path.isdir(OUTPUT_PATH):
         os.makedirs(OUTPUT_PATH)
-
 
     plot_auc(DATABASE, OUTPUT_PATH, results_auc, hidden_channels, 'auc')
     plot_auc(DATABASE, OUTPUT_PATH, results_aupr, hidden_channels, 'aupr')
