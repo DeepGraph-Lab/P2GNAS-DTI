@@ -133,9 +133,9 @@ def main():
         print(f"Using device {device} for dataset {db_name.upper()}.")
 
         MAX_LAYERS = 6
-        NAS_EPOCHS = 10
-        CHILD_TRAIN_EPOCHS = 20
-        TOP_K = 50
+        NAS_EPOCHS = 200
+        CHILD_TRAIN_EPOCHS = 50
+        TOP_K = 60
 
         searcher = RandomSearcher(max_layers=MAX_LAYERS)
 
