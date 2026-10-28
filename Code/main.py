@@ -1,4 +1,5 @@
 import os
+import json
 import numpy as np
 import logging
 import argparse
@@ -8,9 +9,13 @@ import torch_geometric.transforms as T
 
 from sklearn.metrics import roc_auc_score, average_precision_score
 
-from Code import c_adamw
 from P2GNAS import Model, EarlyStopper, shuffle_label_data
 from utils import plot_auc
+
+try:
+    from Code.search_architecture.lstm_search.auto_model import FlexibleGNNModel
+except ImportError:
+    from search_architecture.lstm_search.auto_model import FlexibleGNNModel
 
 
 
@@ -25,7 +30,9 @@ def main():
                              "verbose logging). CRITICAL=0, ERROR=1, WARN=2, INFO=3, "
                              "DEBUG=4")
     parser.add_argument("-d", "--database", help="database: e, nr, ic, gpcr, drugbank", type=str)
-    parser.add_argument("-e", "--hidden", default=17, help="specify dimension of embedding", type=int)
+    parser.add_argument("-e", "--hidden", default=60, help="specify dimension of embedding", type=int)
+    parser.add_argument("--arch", default=None,
+                        help="path to the search log JSON containing the selected architecture")
 
     args = parser.parse_args()
     log_levels = {
@@ -123,7 +130,7 @@ def main():
 
     split = T.RandomLinkSplit(
         num_val=0.1,
-        num_test=0.1,
+        num_test=0.2,
         is_undirected=True,
         add_negative_train_samples=True,  # False for: Not adding negative links to train
         neg_sampling_ratio=1.0,  # ratio of negative sampling is 0
@@ -144,10 +151,33 @@ def main():
     ## Run model
     logging.info(f'hidden channels: {hidden_channels}')
 
-    model = Model(hidden_channels=hidden_channels, data=data).to(device)
+    if hidden_channels != 60:
+        print('Warning: FlexibleGNNModel uses a fixed hidden dimension of 60; the -e value is ignored.')
 
-    # optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
-    optimizer = c_adamw.AdamW(model.parameters(), lr=0.01, betas=(0.9, 0.95), weight_decay=0.01)
+    arch_path = args.arch
+    if arch_path is None:
+        arch_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            'search_architecture', 'results_6', DATABASE, f'{DATABASE}_log.json'
+        )
+    if not os.path.exists(arch_path):
+        raise FileNotFoundError(
+            f"Search result not found: {arch_path}. "
+            "Run the parallel search first or pass --arch /path/to/<dataset>_log.json."
+        )
+    with open(arch_path, 'r', encoding='utf-8') as f:
+        search_record = json.load(f)
+    architecture = search_record['architecture'] if isinstance(search_record, dict) else search_record
+    if isinstance(architecture, str):
+        import ast
+        architecture = ast.literal_eval(architecture)
+    if not isinstance(architecture, list) or not architecture:
+        raise ValueError(f"Invalid architecture in {arch_path}: {architecture!r}")
+
+    model = FlexibleGNNModel(architecture, data.metadata()).to(device)
+    print('Using searched architecture:', architecture)
+
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 
     criterion = torch.nn.BCEWithLogitsLoss()
 
@@ -164,7 +194,7 @@ def main():
     init_time = time.time()
     max_test_auc = 0
     max_test_aupr = 0
-    for epoch in range(1000):
+    for epoch in range(500):
         loss = train(train_data)
         train_auc, _, _, train_loss, train_aupr = test(train_data)
         val_auc, _, _, val_loss, val_aupr = test(val_data)
