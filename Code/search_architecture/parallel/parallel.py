@@ -33,9 +33,9 @@ from Code.search_architecture.random_search.searcher import RandomSearcher
 def lstm_search(db_name,data, train_data, val_data, test_data, device):
 
     print("lstm search have already started!")
-    MAX_LAYERS = 5
+    MAX_LAYERS = 6
     NAS_EPOCHS = 120
-    CHILD_TRAIN_EPOCHS = 10
+    CHILD_TRAIN_EPOCHS = 50
     CONTROLLER_HIDDEN_DIM = 20
     CONTROLLER_LR = 0.001
     TOP_K = 60
@@ -75,15 +75,15 @@ def bayes_search(db_name, data, train_data, val_data, test_data, device):
     ACT_MAP = {i: choice for i, choice in enumerate(ACT_CHOICES)}
 
 
-    child_train_epochs = 10
+    child_train_epochs = 50
     TOP_K = 60
 
-    batch_size = 4
+    batch_size = 2
     num_workers = min(batch_size, os.cpu_count() if os.cpu_count() else 1)
 
 
-    init_points = 60
-    n_iter_points = 60
+    init_points = 50
+    n_iter_points = 50
 
     print(f"Using {num_workers} workers with batch size {batch_size}")
     print(f"Targeting {init_points} init points and {n_iter_points} opt points.")
@@ -95,6 +95,9 @@ def bayes_search(db_name, data, train_data, val_data, test_data, device):
         'l1_conv': (0, len(CONV_MAP) - 0.01), 'l1_norm': (0, len(NORM_MAP) - 0.01), 'l1_act': (0, len(ACT_MAP) - 0.01),
         'l2_conv': (0, len(CONV_MAP) - 0.01), 'l2_norm': (0, len(NORM_MAP) - 0.01), 'l2_act': (0, len(ACT_MAP) - 0.01),
         'l3_conv': (0, len(CONV_MAP) - 0.01), 'l3_norm': (0, len(NORM_MAP) - 0.01), 'l3_act': (0, len(ACT_MAP) - 0.01),
+        'l4_conv': (0, len(CONV_MAP) - 0.01), 'l4_norm': (0, len(NORM_MAP) - 0.01), 'l4_act': (0, len(ACT_MAP) - 0.01),
+        'l5_conv': (0, len(CONV_MAP) - 0.01), 'l5_norm': (0, len(NORM_MAP) - 0.01), 'l5_act': (0, len(ACT_MAP) - 0.01),
+        'l6_conv': (0, len(CONV_MAP) - 0.01), 'l6_norm': (0, len(NORM_MAP) - 0.01), 'l6_act': (0, len(ACT_MAP) - 0.01),
     }
 
     optimizer = BayesianOptimization(
@@ -223,8 +226,8 @@ def evolutionary_search(db_name,data, train_data, val_data, test_data, device):
     ELITISM_COUNT = 2
     TOURNAMENT_SIZE = 3
     MIN_LAYERS = 1
-    MAX_LAYERS = 5
-    CHILD_TRAIN_EPOCHS = 10
+    MAX_LAYERS = 6
+    CHILD_TRAIN_EPOCHS = 50
 
     print(f"--- Initializing population (size: {POPULATION_SIZE}) ---")
     population = [create_random_individual(MIN_LAYERS,MAX_LAYERS,CONV_CHOICES,NORM_CHOICES,ACT_CHOICES) for _ in range(POPULATION_SIZE)]
@@ -276,10 +279,10 @@ def evolutionary_search(db_name,data, train_data, val_data, test_data, device):
 def random_search(db_name,data, train_data, val_data, test_data, device):
 
     print("random search have already started!")
-    MAX_LAYERS = 5
+    MAX_LAYERS = 6
     NAS_EPOCHS = 200
-    CHILD_TRAIN_EPOCHS = 10
-    TOP_K = 120
+    CHILD_TRAIN_EPOCHS = 50
+    TOP_K = 60
 
     searcher = RandomSearcher(max_layers=MAX_LAYERS)
 
@@ -600,4 +603,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
