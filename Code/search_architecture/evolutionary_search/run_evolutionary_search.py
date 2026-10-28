@@ -3,9 +3,9 @@ import torch
 import json
 import random
 import time
-from tqdm import tqdm  # 用于显示进度条，pip install tqdm
+from tqdm import tqdm 
 
-# 复用您项目中的核心模块
+
 from Code.search_architecture.lstm_search.auto_model import FlexibleGNNModel
 from Code.search_architecture.lstm_search.Evaluator import LinkPredictionEvaluator
 from Code.search_architecture.lstm_search.run_nas import load_and_split_data
@@ -107,15 +107,15 @@ def main():
     NORM_CHOICES = ['graphnorm', 'instancenorm', 'layernorm', 'batchnorm', 'identity']
     ACT_CHOICES = ['relu', 'tanh', 'leakyrelu', 'identity']
 
-    POPULATION_SIZE = 20
-    NUM_GENERATIONS = 10
+    POPULATION_SIZE = 60
+    NUM_GENERATIONS = 2
     MUTATION_RATE = 0.1
     CROSSOVER_RATE = 0.8
     ELITISM_COUNT = 2
     TOURNAMENT_SIZE = 3
     MIN_LAYERS = 1
-    MAX_LAYERS = 5
-    CHILD_TRAIN_EPOCHS = 15
+    MAX_LAYERS = 6
+    CHILD_TRAIN_EPOCHS = 50
 
     start_time = time.time()
     db_name = 'e'
@@ -167,7 +167,7 @@ def main():
     print(f"  Fitness (Reward): {best_individual['fitness']:.4f}")
     print(f"  Architecture config: {best_individual['arch']}")
 
-    top_k_results = save_top_k_evolutionary(db_name, population, top_k=5)
+    top_k_results = save_top_k_evolutionary(db_name, population, top_k=60)
 
     end_time = time.time()
     print(f"\nTotal time: {(end_time - start_time) / 60:.2f} minutes")
