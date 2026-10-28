@@ -7,7 +7,7 @@ from bayes_opt import BayesianOptimization, UtilityFunction
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import threading
 
-# 复用您项目中的模型和评估器
+
 from Code.search_architecture.lstm_search.auto_model import FlexibleGNNModel
 from Code.search_architecture.lstm_search.Evaluator import LinkPredictionEvaluator
 from Code.search_architecture.random_search.run_search import load_and_split_data
@@ -120,7 +120,7 @@ def evaluate_batch_parallel(params_batch, train_data, val_data, test_data, devic
 def main():
     child_train_epochs = 50
 
-    batch_size = 2
+    batch_size = 4
     num_workers = os.cpu_count()
     print(f"Using {num_workers} worker threads")
 
