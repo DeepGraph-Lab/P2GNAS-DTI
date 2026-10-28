@@ -210,12 +210,12 @@ def main():
         test_data.to(device)
         print(f"Using device: {device} for dataset {db_name.upper()}")
 
-        MAX_LAYERS = 5
-        NAS_EPOCHS = 100
-        CHILD_TRAIN_EPOCHS = 20
+        MAX_LAYERS = 6
+        NAS_EPOCHS = 120
+        CHILD_TRAIN_EPOCHS = 50
         CONTROLLER_HIDDEN_DIM = 20
         CONTROLLER_LR = 0.001
-        TOP_K = 80
+        TOP_K = 60
 
         controller = NAS_Controller(max_layers=MAX_LAYERS, hidden_dim=CONTROLLER_HIDDEN_DIM).to(device)
         controller_optimizer = torch.optim.Adam(controller.parameters(), lr=CONTROLLER_LR)
