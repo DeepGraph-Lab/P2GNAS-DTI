@@ -68,7 +68,7 @@ if __name__ == "__main__":
         is_undirected=True,
         add_negative_train_samples=True,  # False for: Not adding negative links to train
         neg_sampling_ratio=1.0,  # ratio of negative sampling is 0
-        disjoint_train_ratio=0.3,
+        disjoint_train_ratio=0.2,
         edge_types=[('drug', 'interaction', 'protein')],
         rev_edge_types=[('protein', 'rev_interaction', 'drug')],
         split_labels=False
